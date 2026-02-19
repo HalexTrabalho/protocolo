@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conceitos de Internet: O Guia Técnico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .concept-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .concept-card:hover {
+            transform: translateY(-5px);
+            border-color: #6366f1;
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+        }
+        .search-shadow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+        /* Modal Animation */
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.2s ease-out; }
+    </style>
+</head>
+<body class="text-slate-300 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="py-16 px-6 border-b border-slate-800 bg-slate-900/50">
+        <div class="max-w-5xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+                Infraestrutura da <span class="text-indigo-500">Internet</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
+                Um mergulho técnico nos protocolos e dispositivos que sustentam a rede mundial de computadores.
+            </p>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="sticky top-0 z-40 bg-[#0f172a]/80 backdrop-blur-md py-6 px-6 border-b border-slate-800">
+        <div class="max-w-4xl mx-auto relative">
+            <input 
+                type="text" 
+                id="searchInput"
+                placeholder="Filtrar conceito (ex: DNS, VPN, BGP...)" 
+                class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all search-shadow"
+            >
+            <div class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 hidden md:block">
+                <span class="mono text-xs border border-slate-700 px-2 py-1 rounded">ESC para limpar</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Grid -->
+    <main class="py-12 px-6 max-w-7xl mx-auto">
+        <div id="conceptsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards via JS -->
+        </div>
+        
+        <div id="noResults" class="hidden text-center py-20">
+            <p class="text-xl text-slate-500 italic">Nenhum conceito encontrado.</p>
+        </div>
+    </main>
+
+    <!-- Modal Structure -->
+    <div id="modalOverlay" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-6">
+        <div id="modalContent" class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl transform transition-all">
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <span id="modalCategory" class="mono text-indigo-400 font-bold text-xs tracking-widest uppercase"></span>
+                        <h2 id="modalTitle" class="text-3xl font-bold text-white mt-1"></h2>
+                    </div>
+                    <button onclick="closeModal()" class="text-slate-500 hover:text-white transition-colors text-2xl">&times;</button>
+                </div>
+                <div id="modalDetails" class="space-y-4 text-slate-300 leading-relaxed">
+                    <!-- Details injected via JS -->
+                </div>
+                <div class="mt-8 pt-6 border-t border-slate-800 flex justify-end">
+                    <button onclick="closeModal()" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-colors font-semibold">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-slate-800 text-center text-slate-500 text-sm">
+        <p>&copy; Halex System&reg - Explicação Técnica de Redes</p>
+    </footer>
+
+    <script>
+        const concepts = [
+            { 
+                title: "VPN", 
+                category: "Segurança",
+                desc: "Cria uma conexão segura e criptografada entre o dispositivo e um servidor remoto, mascarando o IP real.",
+                details: "Utiliza protocolos como <strong>OpenVPN, WireGuard ou L2TP/IPsec</strong>. Funciona criando um 'túnel' virtual onde os dados são encapsulados e criptografados (geralmente AES-256). É essencial para contornar censura e proteger dados em redes Wi-Fi públicas."
+            },
+            { 
+                title: "DNS", 
+                category: "Serviço",
+                desc: "Traduz domínios amigáveis (google.com) em endereços IP (142.250...).",
+                details: "Opera na <strong>Porta 53 (UDP/TCP)</strong>. O processo envolve servidores Root, TLD (Top-Level Domain) e Autoritativos. Sem ele, a navegação humana seria impossível, pois teríamos que memorizar sequências numéricas para cada site."
+            },
+            { 
+                title: "DHCP", 
+                category: "Rede",
+                desc: "Atribui automaticamente endereços IP dinâmicos para dispositivos.",
+                details: "Baseia-se no processo <strong>DORA</strong>: Discovery (Descoberta), Offer (Oferta), Request (Solicitação) e Acknowledge (Confirmação). Evita conflitos de IP em redes com muitos dispositivos móveis."
+            },
+            { 
+                title: "BGP", 
+                category: "Roteamento",
+                desc: "O protocolo que 'cola' a internet, gerenciando o roteamento entre sistemas autônomos.",
+                details: "É um <strong>Path Vector Protocol</strong>. Diferente de protocolos internos (OSPF/EIGRP), o BGP lida com políticas de roteamento entre ISPs (Provedores) globais. Falhas no BGP podem derrubar continentes inteiros da rede."
+            },
+            { 
+                title: "QoS", 
+                category: "Gerenciamento",
+                desc: "Prioriza tráfego crítico sobre dados menos urgentes.",
+                details: "Utiliza campos no cabeçalho IP como o <strong>DSCP (Differentiated Services Code Point)</strong>. Permite que uma chamada VoIP não sofra 'jitter' ou atrasos enquanto um download pesado acontece simultaneamente no mesmo link."
+            },
+            { 
+                title: "Firewall", 
+                category: "Segurança",
+                desc: "Barreira de segurança que monitora tráfego baseado em regras.",
+                details: "Pode ser <strong>Stateful</strong> (inspeção de estado) ou <strong>Stateless</strong>. Firewalls modernos (Next-Gen) atuam até a camada 7 (Aplicação), identificando comportamentos de softwares específicos e bloqueando ataques de dia zero."
+            }
+            // Adicione mais se desejar...
+        ];
+
+        const grid = document.getElementById('conceptsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
+        const modal = document.getElementById('modalOverlay');
+
+        function renderConcepts(filter = '') {
+            grid.innerHTML = '';
+            const filtered = concepts.filter(c => 
+                c.title.toLowerCase().includes(filter.toLowerCase()) || 
+                c.desc.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                filtered.forEach((concept, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'concept-card bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col h-full';
+                    card.innerHTML = `
+                        <div class="mb-4">
+                            <span class="mono text-indigo-400 font-bold text-xs tracking-widest uppercase">${concept.category}</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3">${concept.title}</h3>
+                        <p class="text-slate-400 leading-relaxed text-sm flex-grow">${concept.desc}</p>
+                        <div class="mt-6 pt-4 border-t border-slate-800">
+                            <button onclick="openModal(${concepts.indexOf(concept)})" class="text-indigo-500 text-xs font-bold hover:text-indigo-400 transition flex items-center gap-2 uppercase tracking-tighter">
+                                Detalhes Técnicos <span class="text-lg">&rarr;</span>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function openModal(index) {
+            const c = concepts[index];
+            document.getElementById('modalCategory').innerText = c.category;
+            document.getElementById('modalTitle').innerText = c.title;
+            document.getElementById('modalDetails').innerHTML = `<p>${c.details}</p>`;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Lock scroll
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Unlock scroll
+        }
+
+        // Close on click outside
+        modal.addEventListener('click', (e) => {
+            if(e.target === modal) closeModal();
+        });
+
+        searchInput.addEventListener('input', (e) => renderConcepts(e.target.value));
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if(!modal.classList.contains('hidden')) {
+                    closeModal();
+                } else {
+                    searchInput.value = '';
+                    renderConcepts();
+                }
+            }
+        });
+
+        renderConcepts();
+    </script>
+</body>
+</html>
